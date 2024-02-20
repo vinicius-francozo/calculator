@@ -14,40 +14,41 @@
     <div class="container vh-100">
         <div class="row keyboard justify-content-center h-100 ">
             <div class="col-9 col-sm-4 text-center align-self-center d-grid h-75">
-                <div class="row display">
-                    <div class="col-12 bg-secondary-subtle rounded min-vh-15 mb-1"></div>
+                <div class="row">
+                    <div class="col-12 bg-secondary-subtle rounded min-vh-15 mb-1 d-flex justify-content-end"><p class="align-self-center fs-2" id="display"></p></div>
                 </div>
                 <div class="row d-table b-spacing">
-                    <div role="button" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-danger">C</div>
-                    <div role="button" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-info">()</div>
-                    <div role="button" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-info">%</div>
-                    <div role="button" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-info"><i class="fa-solid fa-divide"></i></div>
+                    <div role="button" id="calc-btn-reset" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-danger">C</div>
+                    <div role="button" id="calc-btn-parenthesis" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-info">()</div>
+                    <div role="button" id="calc-btn-percent" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-info">%</div>
+                    <div role="button" id="calc-btn" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-info" data-target="÷"><i class="fa-solid fa-divide"></i></div>
                 </div>
                 <div class="row d-table b-spacing">
-                    <div role="button" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-light">7</div>
-                    <div role="button" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-light">8</div>
-                    <div role="button" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-light">9</div>
-                    <div role="button" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-info"><i class="bi bi-x-lg"></i></div>
+                    <div role="button" id="calc-btn" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-light" data-target="7">7</div>
+                    <div role="button" id="calc-btn" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-light" data-target="8">8</div>
+                    <div role="button" id="calc-btn" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-light" data-target="9">9</div>
+                    <div role="button" id="calc-btn" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-info" data-target="X"><i class="bi bi-x-lg"></i></div>
                 </div>
                 <div class="row d-table b-spacing">
-                    <div role="button" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-light">4</div>
-                    <div role="button" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-light">5</div>
-                    <div role="button" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-light">6</div>
-                    <div role="button" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-info"><i class="bi bi-dash-lg"></i></div>
+                    <div role="button" id="calc-btn" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-light" data-target="4">4</div>
+                    <div role="button" id="calc-btn" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-light" data-target="5">5</div>
+                    <div role="button" id="calc-btn" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-light" data-target="6">6</div>
+                    <div role="button" id="calc-btn" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-info" data-target="-"><i class="bi bi-dash-lg"></i></div>
                 </div>
                 <div class="row d-table b-spacing">
-                    <div role="button" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-light">1</div>
-                    <div role="button" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-light">2</div>
-                    <div role="button" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-light">3</div>
-                    <div role="button" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-info"><i class="bi bi-plus-lg"></i></div>
+                    <div role="button" id="calc-btn" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-light" data-target="1">1</div>
+                    <div role="button" id="calc-btn" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-light" data-target="2">2</div>
+                    <div role="button" id="calc-btn" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-light" data-target="3">3</div>
+                    <div role="button" id="calc-btn" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-info" data-target="+"><i class="bi bi-plus-lg"></i></div>
                 </div>
                 <div class="row d-table b-spacing">
-                    <div role="button" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-light">,</div>
-                    <div role="button" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-light">0</div>
-                    <div role="button" class="col-6 calc-btn d-table-cell align-middle rounded-pill bg-secondary fs-3 text-info"><i class="fa-solid fa-equals"></i></div>
+                    <div role="button" id="calc-btn" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-light" data-target=".">,</div>
+                    <div role="button" id="calc-btn" class="col-3 calc-btn d-table-cell align-middle rounded-circle bg-secondary fs-3 text-light" data-target="0">0</div>
+                    <div role="button" id="calc-btn-calculate" class="col-6 calc-btn d-table-cell align-middle rounded-pill bg-secondary fs-3 text-info"><i class="fa-solid fa-equals"></i></div>
                 </div>
             </div>
         </div>
     </div>
+    <script src="app.js"></script>
 </body>
 </html>

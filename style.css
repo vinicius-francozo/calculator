@@ -1,7 +1,18 @@
-.b-spacing{
+.b-spacing {
     border-spacing: 5px;
 }
 
-.min-vh-15{
+.min-vh-15 {
     min-height: 15vh;
+}
+
+.calc-btn {
+    transition: 0.1s;
+    user-select: none;
+}
+
+.calc-btn:active {
+    font-size: 15px !important;
+    background-color: #7177796c !important;
+    transition: 0.1s;
 }
