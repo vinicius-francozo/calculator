@@ -16,3 +16,7 @@
     background-color: #7177796c !important;
     transition: 0.1s;
 }
+
+#displayContainer {
+    user-select: none;
+}

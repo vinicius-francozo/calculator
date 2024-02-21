@@ -7,6 +7,7 @@ function reset() {
     isRestart = false
     displayContainer.classList.remove('border', 'border-danger')
     eraseButton.classList.add('d-none')
+    isContinuousCalc = false
 }
 
 function calculate() {
@@ -17,8 +18,22 @@ function calculate() {
             '%': '/100'
         }
         const finalValue = display.innerText.replace(/[÷X%]/g, c => replaceObject[c])
+
+        if (!isContinuousCalc){
+            lastOperation = ''
+            for (i = display.innerText.length - 1; i>=0; i--){
+                lastOperation = finalValue[i] + lastOperation
+                if (lookupTokens.includes(finalValue[i])) break
+            }
+        }
+        
+        if (isContinuousCalc && display.innerText) {
+            console.log(lastOperation)
+            return display.innerText = eval(display.innerText + lastOperation)
+        }
         try {
             display.innerText = eval(finalValue)
+            isContinuousCalc = true
         } catch {
             displayContainer.classList.add('border', 'border-danger')
         }
@@ -29,6 +44,7 @@ function calculate() {
 function calculatePercentage() {
     const lastNumber = display.innerText[display.innerText.length - 1]
     if (parseInt(lastNumber) || lastNumber === '0' || lastNumber === ')'){
+        isContinuousCalc = false
         return display.innerText += '%'
     }
     displayContainer.classList.add('border', 'border-danger')
@@ -53,6 +69,7 @@ function addParenthesis() {
     }
     displayContainer.classList.remove('border', 'border-danger')
     eraseButton.classList.remove('d-none')
+    isContinuousCalc = false
     switch (lastNumber) {
         case undefined:
             display.innerText += '('
@@ -90,7 +107,6 @@ function addOperatorOrNumber(event) {
 
     function canInsertComma() {
         let commaCount = 0
-        const lookupTokens = ['(', ')', '+', '-', 'X', '÷', '+', '%']
         for (i of display.innerText){
             if (i === '.') commaCount++
             if (lookupTokens.includes(i)){
@@ -102,6 +118,7 @@ function addOperatorOrNumber(event) {
     }
     displayContainer.classList.remove('border', 'border-danger')
     eraseButton.classList.remove('d-none')
+    isContinuousCalc = false
 
     switch (lastNumber) {
         case undefined:
@@ -143,6 +160,9 @@ function addOperatorOrNumber(event) {
 }
 
 let isRestart = false
+let isContinuousCalc = false
+let lastOperation = ''
+const lookupTokens = ['(', ')', '+', '-', 'X', '÷', '+', '%', '*', '/']
 const eraseButton = document.getElementById('erase')
 const displayContainer = document.getElementById('displayContainer')
 const display = document.getElementById('display')
