@@ -1,6 +1,12 @@
+function erase() {
+    display.innerText = display.innerText.slice(0, -1)
+}
+
 function reset() {
     display.innerText = ''
     isRestart = false
+    displayContainer.classList.remove('border', 'border-danger')
+    eraseButton.classList.add('d-none')
 }
 
 function calculate() {
@@ -8,34 +14,24 @@ function calculate() {
         const replaceObject = {
             '÷': '/',
             'X': '*',
-        }
-        function percentReplace(){
-            console.log('teste')
-            const lookupTokens = ['(', ')', '+', '-', 'X', '÷', '+']
-            let num = ''
-            for (let i = display.innerText.indexOf('%') - 1; i >= 0; i--){
-                if (display.innerText[i].includes(lookupTokens)){
-                    display.innerText = display.innerText.substring(0, i+1) + parseFloat(num)/100 + display.innerText(display.innerText.indexOf('%')+1)
-                }
-                num = display.innerText + num
-            }
-        }
-        const textSubstring = display.innerText.substring(0)
-        for (i of textSubstring){
-            if (i == '%') percentReplace()
+            '%': '/100'
         }
         const finalValue = display.innerText.replace(/[÷X%]/g, c => replaceObject[c])
-        console.log(finalValue)
-        display.innerText = eval(finalValue)
+        try {
+            display.innerText = eval(finalValue)
+        } catch {
+            displayContainer.classList.add('border', 'border-danger')
+        }
         isRestart = true
     }
 }
 
 function calculatePercentage() {
     const lastNumber = display.innerText[display.innerText.length - 1]
-    if (parseInt(lastNumber) > 0){
+    if (parseInt(lastNumber) || lastNumber === '0' || lastNumber === ')'){
         return display.innerText += '%'
     }
+    displayContainer.classList.add('border', 'border-danger')
 }
 
 function addParenthesis() {
@@ -55,6 +51,8 @@ function addParenthesis() {
     if (isRestart){
         reset()
     }
+    displayContainer.classList.remove('border', 'border-danger')
+    eraseButton.classList.remove('d-none')
     switch (lastNumber) {
         case undefined:
             display.innerText += '('
@@ -89,15 +87,33 @@ function addParenthesis() {
 function addOperatorOrNumber(event) {
     const operOrNum = event.target.attributes['data-target'].value
     const lastNumber = display.innerText[display.innerText.length - 1]
-    switch (parseInt(lastNumber)) {
-        case NaN:
-            if (lastNumber === undefined){
-                if (parseInt(operOrNum)){
-                    display.innerText += operOrNum
-                } else if (operOrNum == '.'){
-                    display.innerText += '0.'
-                }
-            } else {
+
+    function canInsertComma() {
+        let commaCount = 0
+        const lookupTokens = ['(', ')', '+', '-', 'X', '÷', '+', '%']
+        for (i of display.innerText){
+            if (i === '.') commaCount++
+            if (lookupTokens.includes(i)){
+                commaCount = 0
+            }
+        }
+        if (commaCount === 0) return true
+        return false
+    }
+    displayContainer.classList.remove('border', 'border-danger')
+    eraseButton.classList.remove('d-none')
+
+    switch (lastNumber) {
+        case undefined:
+            if (parseInt(operOrNum)){
+                display.innerText += operOrNum
+            } else if (operOrNum == '.'){
+                if (canInsertComma()) display.innerText += '0.'
+            }
+            isRestart = false
+            break
+        default:
+            if (!parseInt(lastNumber)){
                 if (parseInt(operOrNum)){
                     display.innerText += operOrNum
                 } else if (operOrNum != '.' && !parseInt(operOrNum)){
@@ -105,19 +121,21 @@ function addOperatorOrNumber(event) {
                 } else {
                     display.innerText += '0.'
                 }
-            }
-            isRestart = false
-            break
-        default:
-            if (operOrNum == '.'){
-                if (display.innerText.indexOf('.') === -1){
-                    display.innerText += operOrNum
+            } else {
+                if (operOrNum == '.'){
+                    if (canInsertComma()){
+                        display.innerText += operOrNum
+                    }
+                } else{
+                    if (parseInt(operOrNum) && isRestart){
+                        reset()
+                    }
+                    if (lastNumber === ')' || lastNumber === '%'){
+                        display.innerText += `X${operOrNum}`
+                    } else {
+                        display.innerText += operOrNum
+                    }
                 }
-            } else{
-                if (parseInt(operOrNum) && isRestart){
-                    reset()
-                }
-                display.innerText += operOrNum
             }
             isRestart = false
             break
@@ -125,7 +143,10 @@ function addOperatorOrNumber(event) {
 }
 
 let isRestart = false
+const eraseButton = document.getElementById('erase')
+const displayContainer = document.getElementById('displayContainer')
 const display = document.getElementById('display')
+const eraseButtonEvent = document.getElementById('erase').addEventListener('click', erase)
 const resetButtonEvent = document.getElementById('calc-btn-reset').addEventListener('click', reset)
 const parenthesisButtonEvent = document.getElementById('calc-btn-parenthesis').addEventListener('click', addParenthesis)
 const percentageButtonEvent = document.getElementById('calc-btn-percent').addEventListener('click', calculatePercentage)
