@@ -1,5 +1,39 @@
+function keyboardFocus(){
+    var range = document.createRange();
+    var selection = window.getSelection();
+    range.setStart(display.childNodes[display.childNodes.length - 1], display.childNodes[display.childNodes.length - 1].textContent.length);
+    range.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(range);
+}
+
+function validateKeyboard(event) {
+    if (!calculateSize()) event.preventDefault()
+    var keyCode = event.keyCode || event.which;
+    var allowedKeys = [8, 9, 13, 37, 39, 37, 46, 40, 41, 42, 43, 47, 45]; 
+    if ((keyCode < 48 || keyCode > 57) && allowedKeys.indexOf(keyCode) === -1) {
+        event.preventDefault();
+    } else if (keyCode === 37) {
+        event.preventDefault()
+        calculatePercentage()
+        keyboardFocus()
+    } else if (keyCode > 47 && keyCode < 58 && display.innerText[display.innerText.length - 1] === '%'){
+        display.innerText += 'X'
+        keyboardFocus()
+        isContinuousCalc = false
+    } else if (keyCode === 13){
+        event.preventDefault()
+        calculate()
+        return keyboardFocus()
+    }
+
+    if (display.innerText) eraseButton.classList.remove('d-none')
+    isContinuousCalc = false
+}
+
 function erase() {
     display.innerText = display.innerText.slice(0, -1)
+    displayContainer.classList.remove('border', 'border-danger')
 }
 
 function reset() {
@@ -8,6 +42,12 @@ function reset() {
     displayContainer.classList.remove('border', 'border-danger')
     eraseButton.classList.add('d-none')
     isContinuousCalc = false
+}
+
+function calculateSize() {
+    if (display.innerText.length <= 13) return true
+    displayContainer.classList.add('border', 'border-danger')
+    return false
 }
 
 function calculate() {
@@ -28,12 +68,12 @@ function calculate() {
         }
         
         if (isContinuousCalc && display.innerText) {
-            console.log(lastOperation)
             return display.innerText = eval(display.innerText + lastOperation)
         }
         try {
             display.innerText = eval(finalValue)
             isContinuousCalc = true
+            displayContainer.classList.remove('border', 'border-danger')
         } catch {
             displayContainer.classList.add('border', 'border-danger')
         }
@@ -42,6 +82,7 @@ function calculate() {
 }
 
 function calculatePercentage() {
+    if (!calculateSize()) return
     const lastNumber = display.innerText[display.innerText.length - 1]
     if (parseInt(lastNumber) || lastNumber === '0' || lastNumber === ')'){
         isContinuousCalc = false
@@ -51,6 +92,9 @@ function calculatePercentage() {
 }
 
 function addParenthesis() {
+    if (isRestart){
+        reset()
+    }
     const lastNumber = display.innerText[display.innerText.length - 1]
 
     const openParenthesisCount = (display.innerText.match(/\(/g) || []).length
@@ -64,9 +108,7 @@ function addParenthesis() {
             return 'X('
         }
     }
-    if (isRestart){
-        reset()
-    }
+    
     displayContainer.classList.remove('border', 'border-danger')
     eraseButton.classList.remove('d-none')
     isContinuousCalc = false
@@ -102,6 +144,7 @@ function addParenthesis() {
 }
 
 function addOperatorOrNumber(event) {
+    if (!calculateSize()) return
     const operOrNum = event.target.attributes['data-target'].value
     const lastNumber = display.innerText[display.innerText.length - 1]
 
@@ -122,7 +165,7 @@ function addOperatorOrNumber(event) {
 
     switch (lastNumber) {
         case undefined:
-            if (parseInt(operOrNum)){
+            if (parseInt(operOrNum) || operOrNum === '0'){
                 display.innerText += operOrNum
             } else if (operOrNum == '.'){
                 if (canInsertComma()) display.innerText += '0.'
@@ -130,13 +173,17 @@ function addOperatorOrNumber(event) {
             isRestart = false
             break
         default:
-            if (!parseInt(lastNumber)){
-                if (parseInt(operOrNum)){
+            if (!parseInt(lastNumber) && lastNumber !== '0'){
+                if (parseInt(operOrNum) || operOrNum === '0'){
                     display.innerText += operOrNum
-                } else if (operOrNum != '.' && !parseInt(operOrNum)){
-                    display.innerText = display.innerText.slice(0, -1) + operOrNum
+                } else if (operOrNum != '.' && !parseInt(operOrNum) && operOrNum !== '0'){
+                    if (['(', ')'].includes(lastNumber)){
+                        display.innerText += operOrNum
+                    } else {
+                        display.innerText = display.innerText.slice(0, -1) + operOrNum
+                    }
                 } else {
-                    display.innerText += '0.'
+                    if (canInsertComma()) display.innerText += '0.'
                 }
             } else {
                 if (operOrNum == '.'){
@@ -144,7 +191,7 @@ function addOperatorOrNumber(event) {
                         display.innerText += operOrNum
                     }
                 } else{
-                    if (parseInt(operOrNum) && isRestart){
+                    if ((parseInt(operOrNum) || operOrNum === '0') && isRestart){
                         reset()
                     }
                     if (lastNumber === ')' || lastNumber === '%'){
@@ -166,6 +213,9 @@ const lookupTokens = ['(', ')', '+', '-', 'X', '÷', '+', '%', '*', '/']
 const eraseButton = document.getElementById('erase')
 const displayContainer = document.getElementById('displayContainer')
 const display = document.getElementById('display')
+const displayFocus = document.getElementById('display').focus()
+const documentKeydownEvent = document.addEventListener('keydown', () => {display.focus()})
+const displayKeypressEvent = document.getElementById('display').addEventListener('keypress', validateKeyboard)
 const eraseButtonEvent = document.getElementById('erase').addEventListener('click', erase)
 const resetButtonEvent = document.getElementById('calc-btn-reset').addEventListener('click', reset)
 const parenthesisButtonEvent = document.getElementById('calc-btn-parenthesis').addEventListener('click', addParenthesis)
