@@ -72,7 +72,12 @@ function calculate() {
         }
         
         if (isContinuousCalc && display.innerText) {
-            return display.innerText = eval(display.innerText + lastOperation)
+            display.innerText = eval(display.innerText + lastOperation)
+            if (!calculateSize()) {
+                display.innerText = 'Conta muito grande'
+                displayContainer.classList.add('border', 'border-danger')    
+            }
+            return
         }
         try {
             for (i of display.innerText.split('')){
