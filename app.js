@@ -78,12 +78,13 @@ function calculate() {
             for (i of display.innerText.split('')){
                 if (lookupTokens.includes(i)) isContinuousCalc = true
             }
-            if (toString(eval(finalValue)).length > 13) {
+
+            display.innerText = eval(finalValue)
+            if (!calculateSize()) {
                 display.innerText = 'Conta muito grande'
                 displayContainer.classList.add('border', 'border-danger')
                 return    
             }
-            display.innerText = eval(finalValue)
             displayContainer.classList.remove('border', 'border-danger')
         } catch {
             displayContainer.classList.add('border', 'border-danger')
