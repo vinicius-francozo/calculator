@@ -11,22 +11,26 @@ function validateKeyboard(event) {
     if (!calculateSize()) event.preventDefault()
     var keyCode = event.keyCode || event.which;
     var allowedKeys = [8, 9, 13, 37, 39, 37, 46, 40, 41, 42, 43, 47, 45]; 
-    if ((keyCode < 48 || keyCode > 57) && allowedKeys.indexOf(keyCode) === -1) {
+    if ((keyCode < 48 || keyCode > 57) && allowedKeys.indexOf(keyCode) === -1){
         event.preventDefault();
     } else if (keyCode === 37) {
         event.preventDefault()
         calculatePercentage()
         keyboardFocus()
-    } else if (keyCode > 47 && keyCode < 58 && display.innerText[display.innerText.length - 1] === '%'){
-        display.innerText += 'X'
+    } else if ((keyCode > 47 && keyCode < 58) || [42, 45, 43, 47].includes(keyCode) ){
+        event.preventDefault()
+        addOperatorOrNumber(event.key)
         keyboardFocus()
         isContinuousCalc = false
     } else if (keyCode === 13){
         event.preventDefault()
         calculate()
         return keyboardFocus()
+    } else if ([40, 41].includes(keyCode)){
+        event.preventDefault()
+        addParenthesis()
+        keyboardFocus()
     }
-
     if (display.innerText) eraseButton.classList.remove('d-none')
     isContinuousCalc = false
 }
@@ -71,8 +75,15 @@ function calculate() {
             return display.innerText = eval(display.innerText + lastOperation)
         }
         try {
+            for (i of display.innerText.split('')){
+                if (lookupTokens.includes(i)) isContinuousCalc = true
+            }
+            if (toString(eval(finalValue)).length > 13) {
+                display.innerText = 'Conta muito grande'
+                displayContainer.classList.add('border', 'border-danger')
+                return    
+            }
             display.innerText = eval(finalValue)
-            isContinuousCalc = true
             displayContainer.classList.remove('border', 'border-danger')
         } catch {
             displayContainer.classList.add('border', 'border-danger')
@@ -109,6 +120,8 @@ function addParenthesis() {
         }
     }
     
+    if (!calculateSize()) return
+
     displayContainer.classList.remove('border', 'border-danger')
     eraseButton.classList.remove('d-none')
     isContinuousCalc = false
@@ -143,9 +156,9 @@ function addParenthesis() {
     isRestart = false
 }
 
-function addOperatorOrNumber(event) {
+function addOperatorOrNumber(eventOrValue) {
     if (!calculateSize()) return
-    const operOrNum = event.target.attributes['data-target'].value
+    const operOrNum = eventOrValue.target?.attributes['data-target'].value || eventOrValue
     const lastNumber = display.innerText[display.innerText.length - 1]
 
     function canInsertComma() {
@@ -175,7 +188,11 @@ function addOperatorOrNumber(event) {
         default:
             if (!parseInt(lastNumber) && lastNumber !== '0'){
                 if (parseInt(operOrNum) || operOrNum === '0'){
-                    display.innerText += operOrNum
+                    if (lastNumber === ')' || lastNumber === '%'){
+                        display.innerText += `X${operOrNum}`
+                    } else {
+                        display.innerText += operOrNum
+                    }
                 } else if (operOrNum != '.' && !parseInt(operOrNum) && operOrNum !== '0'){
                     if (['(', ')'].includes(lastNumber)){
                         display.innerText += operOrNum
@@ -194,11 +211,7 @@ function addOperatorOrNumber(event) {
                     if ((parseInt(operOrNum) || operOrNum === '0') && isRestart){
                         reset()
                     }
-                    if (lastNumber === ')' || lastNumber === '%'){
-                        display.innerText += `X${operOrNum}`
-                    } else {
-                        display.innerText += operOrNum
-                    }
+                    display.innerText += operOrNum
                 }
             }
             isRestart = false
