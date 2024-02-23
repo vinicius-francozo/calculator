@@ -1,6 +1,6 @@
 function keyboardFocus(){
-    var range = document.createRange();
-    var selection = window.getSelection();
+    const range = document.createRange();
+    const selection = window.getSelection();
     range.setStart(display.childNodes[display.childNodes.length - 1], display.childNodes[display.childNodes.length - 1].textContent.length);
     range.collapse(true);
     selection.removeAllRanges();
@@ -9,8 +9,8 @@ function keyboardFocus(){
 
 function validateKeyboard(event) {
     if (!calculateSize()) event.preventDefault()
-    var keyCode = event.keyCode || event.which;
-    var allowedKeys = [8, 9, 13, 37, 39, 37, 46, 40, 41, 42, 43, 47, 45]; 
+    const keyCode = event.keyCode || event.which;
+    const allowedKeys = [8, 9, 13, 37, 39, 37, 46, 40, 41, 42, 43, 47, 45]; 
     if ((keyCode < 48 || keyCode > 57) && allowedKeys.indexOf(keyCode) === -1){
         event.preventDefault();
     } else if (keyCode === 37) {
@@ -65,9 +65,9 @@ function calculate() {
 
         if (!isContinuousCalc){
             lastOperation = ''
-            for (i = display.innerText.length - 1; i>=0; i--){
-                lastOperation = finalValue[i] + lastOperation
-                if (lookupTokens.includes(finalValue[i])) break
+            for (index = display.innerText.length - 1; index>=0; index--){
+                lastOperation = finalValue[index] + lastOperation
+                if (lookupTokens.includes(finalValue[index])) break
             }
         }
         
@@ -80,8 +80,8 @@ function calculate() {
             return
         }
         try {
-            for (i of display.innerText.split('')){
-                if (lookupTokens.includes(i)) isContinuousCalc = true
+            for (index of display.innerText.split('')){
+                if (lookupTokens.includes(index)) isContinuousCalc = true
             }
 
             display.innerText = eval(finalValue)
@@ -169,9 +169,9 @@ function addOperatorOrNumber(eventOrValue) {
 
     function canInsertComma() {
         let commaCount = 0
-        for (i of display.innerText){
-            if (i === '.') commaCount++
-            if (lookupTokens.includes(i)){
+        for (index of display.innerText){
+            if (index === '.') commaCount++
+            if (lookupTokens.includes(index)){
                 commaCount = 0
             }
         }
@@ -182,46 +182,41 @@ function addOperatorOrNumber(eventOrValue) {
     eraseButton.classList.remove('d-none')
     isContinuousCalc = false
 
-    switch (lastNumber) {
-        case undefined:
+    if (lastNumber === undefined){
+        if (parseInt(operOrNum) || operOrNum === '0'){
+            display.innerText += operOrNum
+        } else if (operOrNum == '.' && canInsertComma()){
+            display.innerText += '0.'
+        }
+        isRestart = false
+    } else{
+        if (!parseInt(lastNumber) && lastNumber !== '0'){
             if (parseInt(operOrNum) || operOrNum === '0'){
-                display.innerText += operOrNum
-            } else if (operOrNum == '.'){
-                if (canInsertComma()) display.innerText += '0.'
-            }
-            isRestart = false
-            break
-        default:
-            if (!parseInt(lastNumber) && lastNumber !== '0'){
-                if (parseInt(operOrNum) || operOrNum === '0'){
-                    if (lastNumber === ')' || lastNumber === '%'){
-                        display.innerText += `X${operOrNum}`
-                    } else {
-                        display.innerText += operOrNum
-                    }
-                } else if (operOrNum != '.' && !parseInt(operOrNum) && operOrNum !== '0'){
-                    if (['(', ')'].includes(lastNumber)){
-                        display.innerText += operOrNum
-                    } else {
-                        display.innerText = display.innerText.slice(0, -1) + operOrNum
-                    }
+                if (lastNumber === ')' || lastNumber === '%'){
+                    display.innerText += `X${operOrNum}`
                 } else {
-                    if (canInsertComma()) display.innerText += '0.'
-                }
-            } else {
-                if (operOrNum == '.'){
-                    if (canInsertComma()){
-                        display.innerText += operOrNum
-                    }
-                } else{
-                    if ((parseInt(operOrNum) || operOrNum === '0') && isRestart){
-                        reset()
-                    }
                     display.innerText += operOrNum
                 }
+            } else if (operOrNum != '.' && !parseInt(operOrNum) && operOrNum !== '0'){
+                if (['(', ')'].includes(lastNumber)){
+                    display.innerText += operOrNum
+                } else {
+                    display.innerText = display.innerText.slice(0, -1) + operOrNum
+                }
+            } else {
+                if (canInsertComma()) display.innerText += '0.'
             }
-            isRestart = false
-            break
+        } else {
+            if (operOrNum == '.'){
+                if (canInsertComma()) display.innerText += operOrNum
+            } else{
+                if ((parseInt(operOrNum) || operOrNum === '0') && isRestart){
+                    reset()
+                }
+                display.innerText += operOrNum
+            }
+        }
+        isRestart = false
     }
 }
 
